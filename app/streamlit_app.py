@@ -9,187 +9,6 @@ WAREHOUSE_PATH = os.path.join(PROJECT_ROOT, "warehouse.duckdb")
 
 sys.path.insert(0, APP_DIR)
 
-st.set_page_config(page_title="Melt Risk Agent", page_icon="🍦", layout="centered")
-
-# ----------------------------------------------------------------------------
-# Theme: hand-picked ice-cream-parlor palette + a melting-scoop signature motif
-# ----------------------------------------------------------------------------
-CREAM = "#FFF8EF"
-STRAWBERRY = "#FF6F91"
-STRAWBERRY_DARK = "#E8547A"
-MINT = "#4FD1B8"
-CARAMEL = "#F2A65A"
-CHOCOLATE = "#3A2618"
-PINK_SOFT = "#FFE3EC"
-MINT_SOFT = "#DDF7F0"
-
-st.markdown(
-    f"""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap');
-
-    html, body, [class*="css"] {{
-        font-family: 'Nunito', sans-serif;
-    }}
-
-    .stApp {{
-        background: radial-gradient(circle at 12% 8%, {PINK_SOFT} 0%, transparent 38%),
-                    radial-gradient(circle at 88% 4%, {MINT_SOFT} 0%, transparent 32%),
-                    {CREAM};
-    }}
-
-    /* ---------- Hero banner + melt-drip signature divider ---------- */
-    .hero-banner {{
-        background: linear-gradient(135deg, {STRAWBERRY} 0%, {CARAMEL} 55%, {MINT} 100%);
-        border-radius: 26px 26px 0 0;
-        padding: 30px 28px 34px 28px;
-        margin: -1rem -1rem 0 -1rem;
-        box-shadow: 0 8px 24px rgba(58, 38, 24, 0.12);
-    }}
-    .hero-title {{
-        font-family: 'Baloo 2', sans-serif;
-        font-weight: 800;
-        font-size: 2.3rem;
-        color: #FFFFFF;
-        margin: 0;
-        text-shadow: 0 2px 6px rgba(0,0,0,0.12);
-    }}
-    .hero-caption {{
-        font-family: 'Nunito', sans-serif;
-        font-weight: 600;
-        font-size: 0.98rem;
-        color: rgba(255,255,255,0.94);
-        margin-top: 8px;
-        line-height: 1.45;
-    }}
-    .melt-drip {{
-        height: 22px;
-        margin: 0 -1rem 1.6rem -1rem;
-        background:
-            radial-gradient(circle at 10px 0, transparent 11px, {CARAMEL} 12px) 4px -11px / 24px 22px repeat-x;
-        opacity: 0.9;
-    }}
-
-    /* ---------- Headings inherit the playful display face ---------- */
-    h1, h2, h3 {{
-        font-family: 'Baloo 2', sans-serif;
-        color: {CHOCOLATE};
-    }}
-
-    /* ---------- Sidebar: "menu card" styling ---------- */
-    section[data-testid="stSidebar"] {{
-        background: linear-gradient(180deg, {MINT_SOFT} 0%, {CREAM} 55%);
-        border-right: 3px dashed rgba(58,38,24,0.12);
-    }}
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3 {{
-        font-family: 'Baloo 2', sans-serif;
-        color: {CHOCOLATE};
-    }}
-
-    .suggestion-pill > button {{
-        width: 100%;
-        text-align: left;
-        background: #FFFFFF;
-        color: {CHOCOLATE};
-        border: 2px solid {PINK_SOFT};
-        border-radius: 999px;
-        padding: 8px 16px;
-        font-weight: 700;
-        font-size: 0.85rem;
-        margin-bottom: 8px;
-        box-shadow: 0 2px 4px rgba(58,38,24,0.06);
-        transition: all 0.15s ease;
-    }}
-    .suggestion-pill > button:hover {{
-        border-color: {STRAWBERRY};
-        color: {STRAWBERRY_DARK};
-        transform: translateY(-1px);
-    }}
-
-    .arch-card {{
-        background: #FFFFFF;
-        border-radius: 14px;
-        padding: 12px 14px;
-        font-size: 0.82rem;
-        color: {CHOCOLATE};
-        border: 2px solid {MINT_SOFT};
-        line-height: 1.5;
-    }}
-
-    /* ---------- Buttons everywhere else (Reset, Save) ---------- */
-    .stButton > button {{
-        border-radius: 999px;
-        font-weight: 800;
-        font-family: 'Baloo 2', sans-serif;
-        border: none;
-        background: linear-gradient(135deg, {STRAWBERRY} 0%, {STRAWBERRY_DARK} 100%);
-        color: white;
-        padding: 8px 20px;
-        box-shadow: 0 3px 8px rgba(232,84,122,0.28);
-    }}
-    .stButton > button:hover {{
-        filter: brightness(1.06);
-        box-shadow: 0 5px 12px rgba(232,84,122,0.35);
-    }}
-
-    /* ---------- Chat bubbles ---------- */
-    [data-testid="stChatMessage"] {{
-        border-radius: 20px;
-        padding: 4px 6px;
-        margin-bottom: 10px;
-    }}
-    div:has([data-testid="stChatMessageAvatarUser"]) {{
-        background: #FFE3EC !important;
-        border-radius: 18px;
-    }}
-    div:has([data-testid="stChatMessageAvatarAssistant"]) {{
-        background: #DDF7F0 !important;
-        border-radius: 18px;
-    }}
-
-    /* ---------- Chat input + text input ---------- */
-    [data-testid="stChatInput"] {{
-        border-radius: 999px;
-        border: 2px solid {STRAWBERRY};
-    }}
-    .stTextInput > div > div > input {{
-        border-radius: 999px;
-        border: 2px solid {MINT};
-    }}
-
-    /* ---------- Info box (API key prompt) ---------- */
-    div[data-testid="stForm"] {{
-        background: #FFFFFF;
-        border-radius: 18px;
-        padding: 18px;
-        border: 2px dashed {CARAMEL};
-    }}
-
-    /* ---------- Scrollbar sprinkles ---------- */
-    ::-webkit-scrollbar {{ width: 10px; }}
-    ::-webkit-scrollbar-thumb {{ background: {MINT}; border-radius: 10px; }}
-    ::-webkit-scrollbar-track {{ background: {CREAM}; }}
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-st.markdown(
-    """
-    <div class="hero-banner">
-        <div class="hero-title">🍦 Melt Risk Agent</div>
-        <div class="hero-caption">
-            An agentic AI analyst for ice-cream cold-chain distribution. Ask about melt risk,
-            stock levels, or demand — it queries a real dbt + DuckDB warehouse and reasons over
-            the results using Groq's Llama&nbsp;3.3&nbsp;70B with tool calling.
-        </div>
-    </div>
-    <div class="melt-drip"></div>
-    """,
-    unsafe_allow_html=True,
-)
-
 
 @st.cache_resource(show_spinner=False)
 def bootstrap_pipeline():
@@ -204,10 +23,19 @@ def bootstrap_pipeline():
     env = os.environ.copy()
     env["MELT_RISK_DB_PATH"] = WAREHOUSE_PATH
     env["DBT_PROFILES_DIR"] = os.path.join(PROJECT_ROOT, "dbt_project")
+
+    # Use the exact same Python interpreter running this Streamlit app (sys.executable),
+    # not a bare "python3" command - on some hosts (like Streamlit Cloud) "python3" can
+    # resolve to a different interpreter than the one with our pip-installed packages.
+    python_exe = sys.executable
+    dbt_exe = os.path.join(os.path.dirname(python_exe), "dbt")
+    if not os.path.exists(dbt_exe):
+        dbt_exe = "dbt"  # fall back to PATH if not found alongside the interpreter
+
     steps = [
-        (["python3", "generate_data.py"], os.path.join(PROJECT_ROOT, "data")),
-        (["python3", "load_to_duckdb.py"], os.path.join(PROJECT_ROOT, "data")),
-        (["dbt", "run"], os.path.join(PROJECT_ROOT, "dbt_project")),
+        ([python_exe, "generate_data.py"], os.path.join(PROJECT_ROOT, "data")),
+        ([python_exe, "load_to_duckdb.py"], os.path.join(PROJECT_ROOT, "data")),
+        ([dbt_exe, "run"], os.path.join(PROJECT_ROOT, "dbt_project")),
     ]
     for cmd, cwd in steps:
         result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, env=env)
@@ -216,10 +44,195 @@ def bootstrap_pipeline():
     return "built fresh"
 
 
-with st.spinner("🍨 Scooping up the data pipeline (first load only)..."):
+with st.spinner("Setting up data pipeline (first load only)..."):
     bootstrap_pipeline()
 
 from agent import run_agent
+
+st.set_page_config(page_title="Melt Risk Agent", page_icon="🍦", layout="centered")
+
+# ============================== THEME / CSS ==============================
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+    --cream: #FFF6EC;
+    --deep-navy: #0E2138;
+    --deep-navy-2: #16314F;
+    --raspberry: #FF5D8F;
+    --raspberry-dark: #E14577;
+    --mint: #5EEAD4;
+    --peach: #FFB37B;
+    --choco: #4A2E1F;
+    --text-light: #F6F3EE;
+}
+
+html, body, [class*="css"] {
+    font-family: 'Nunito', sans-serif;
+}
+
+/* Main app background: deep frosty navy with soft blurred dessert-colored blobs */
+.stApp {
+    background:
+        radial-gradient(circle at 12% 8%, rgba(255, 93, 143, 0.30) 0%, transparent 40%),
+        radial-gradient(circle at 88% 15%, rgba(94, 234, 212, 0.22) 0%, transparent 38%),
+        radial-gradient(circle at 50% 95%, rgba(255, 179, 123, 0.18) 0%, transparent 45%),
+        linear-gradient(180deg, var(--deep-navy) 0%, var(--deep-navy-2) 100%);
+    background-attachment: fixed;
+}
+
+/* ---------- Header banner ---------- */
+.mr-header {
+    padding: 2.2rem 1.8rem 3.2rem 1.8rem;
+    text-align: center;
+    position: relative;
+}
+.mr-title {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    line-height: 1.05;
+    margin: 0;
+    background: linear-gradient(90deg, var(--raspberry) 0%, var(--peach) 45%, var(--mint) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: mr-shimmer 7s ease-in-out infinite;
+}
+@keyframes mr-shimmer {
+    0%   { background-position: 0% center; }
+    50%  { background-position: 100% center; }
+    100% { background-position: 0% center; }
+}
+.mr-subtitle {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    color: #C9D6E5;
+    max-width: 640px;
+    margin: 0.7rem auto 0 auto;
+    font-size: 1.02rem;
+    line-height: 1.5;
+}
+/* Melting drip divider under the header */
+.mr-drip {
+    height: 34px;
+    margin-top: -1px;
+    background-image: radial-gradient(circle at 22px -12px, transparent 20px, var(--cream) 21px);
+    background-size: 44px 44px;
+    background-repeat: repeat-x;
+    background-position: bottom;
+}
+
+/* ---------- Badges row ---------- */
+.mr-badges { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+.mr-badge {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-light);
+    padding: 0.28rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+/* ---------- Sidebar ---------- */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0B1A2C 0%, #10233B 100%);
+    border-right: 1px solid rgba(255,255,255,0.06);
+}
+[data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+    font-family: 'Baloo 2', sans-serif;
+    color: var(--mint) !important;
+}
+[data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] span {
+    color: #D8E2EC;
+}
+[data-testid="stSidebar"] .stButton button {
+    width: 100%;
+    text-align: left;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--text-light);
+    border-radius: 12px;
+    padding: 0.55rem 0.9rem;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.15s ease;
+}
+[data-testid="stSidebar"] .stButton button:hover {
+    background: linear-gradient(90deg, rgba(255,93,143,0.25), rgba(94,234,212,0.25));
+    border-color: var(--mint);
+    transform: translateX(2px);
+}
+
+/* ---------- Chat area ---------- */
+.stChatMessage, [data-testid="stChatMessage"] {
+    background: rgba(255, 246, 236, 0.97) !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    padding: 0.4rem 0.2rem;
+    margin-bottom: 0.7rem;
+}
+[data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li {
+    color: var(--choco) !important;
+    font-weight: 600;
+}
+[data-testid="stChatMessage"] strong { color: var(--raspberry-dark) !important; }
+
+/* Chat input box */
+[data-testid="stChatInput"] {
+    background: rgba(255, 246, 236, 0.95);
+    border-radius: 16px;
+    border: 2px solid var(--mint);
+}
+[data-testid="stChatInput"] textarea {
+    color: var(--choco) !important;
+    font-weight: 600;
+}
+
+/* Generic buttons in main area */
+.stButton button {
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+/* Form / API key card */
+[data-testid="stForm"] {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 1.4rem;
+}
+
+/* Hide default Streamlit chrome we don't need */
+#MainMenu, footer { visibility: hidden; }
+</style>
+""", unsafe_allow_html=True)
+
+# ============================== HEADER ==============================
+st.markdown("""
+<div class="mr-header">
+    <div style="font-size: 3.2rem;">🍦</div>
+    <h1 class="mr-title">Melt Risk Agent</h1>
+    <p class="mr-subtitle">
+        An agentic AI analyst for ice cream cold-chain distribution. Ask about melt risk,
+        stock levels, or demand — it queries a real dbt + DuckDB warehouse and reasons over
+        the results using Groq's Llama 3.3 70B with tool calling.
+    </p>
+    <div class="mr-badges">
+        <span class="mr-badge">🧊 DuckDB</span>
+        <span class="mr-badge">🔧 dbt</span>
+        <span class="mr-badge">🤖 Groq · Llama 3.3 70B</span>
+        <span class="mr-badge">⚡ Agentic tool-calling</span>
+    </div>
+</div>
+<div class="mr-drip"></div>
+""", unsafe_allow_html=True)
 
 # --- API key handling: Streamlit secrets (deployed) or manual entry (local) ---
 try:
@@ -230,10 +243,12 @@ if not api_key:
     api_key = st.session_state.get("groq_api_key")
 
 if not api_key:
+    st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
     with st.form("api_key_form"):
-        st.info("🍒 Enter your free Groq API key to start (get one at console.groq.com/keys). It is not stored anywhere.")
-        key_input = st.text_input("Groq API Key", type="password")
-        submitted = st.form_submit_button("Save")
+        st.markdown("##### 🔑 Enter your free Groq API key to start")
+        st.caption("Get one at console.groq.com/keys — it's free, takes 30 seconds, and is never stored anywhere.")
+        key_input = st.text_input("Groq API Key", type="password", label_visibility="collapsed")
+        submitted = st.form_submit_button("Let's go 🍨")
         if submitted and key_input:
             st.session_state["groq_api_key"] = key_input
             st.rerun()
@@ -243,56 +258,60 @@ os.environ["GROQ_API_KEY"] = api_key
 
 if "history" not in st.session_state:
     st.session_state.history = []
-if "pending_prompt" not in st.session_state:
-    st.session_state.pending_prompt = None
+if "queued_prompt" not in st.session_state:
+    st.session_state.queued_prompt = None
 
 SUGGESTIONS = [
-    "Which shipments are at critical melt risk right now?",
-    "What products are understocked?",
-    "Forecast demand for IC001 at CW01",
-    "Which warehouse has the most cold-chain problems?",
-    "Summarize overall risk across the network",
+    "🚨 Which shipments are at critical melt risk?",
+    "📦 What products are understocked?",
+    "📈 Forecast demand for IC001 at CW01",
+    "🌡️ Which warehouse has the worst cold-chain issues?",
+    "📋 Summarize overall risk across the network",
 ]
 
 with st.sidebar:
-    st.header("🍧 Try asking")
-    for i, suggestion in enumerate(SUGGESTIONS):
-        st.markdown('<div class="suggestion-pill">', unsafe_allow_html=True)
-        if st.button(suggestion, key=f"suggestion_{i}"):
-            st.session_state.pending_prompt = suggestion
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("### 🍨 Try asking")
+    for s in SUGGESTIONS:
+        if st.button(s, key=f"sugg_{s}", use_container_width=True):
+            st.session_state.queued_prompt = s.split(" ", 1)[1]  # strip emoji
+            st.rerun()
 
     st.divider()
-    st.markdown("**🏗️ Architecture**")
+    st.markdown("### 🏗️ Architecture")
     st.markdown(
-        '<div class="arch-card">Synthetic data → DuckDB → dbt (staging + marts) → '
-        "Groq agent (tool-calling loop) → Streamlit</div>",
-        unsafe_allow_html=True,
+        "Synthetic data → **DuckDB** → **dbt** "
+        "(staging + marts) → **Groq agent** (tool-calling loop) → **Streamlit**"
     )
+
     st.divider()
-    if st.button("🔄 Reset conversation"):
+    if st.button("🔄 Reset conversation", use_container_width=True):
         st.session_state.history = []
         st.rerun()
 
+# ============================== CHAT ==============================
 for msg in st.session_state.history:
-    avatar = "🧑" if msg["role"] == "user" else "🍦"
+    avatar = "🍦" if msg["role"] == "assistant" else "🙋"
     with st.chat_message(msg["role"], avatar=avatar):
         st.markdown(msg["content"])
 
-prompt = st.chat_input("Ask about melt risk, inventory, or demand...")
-if not prompt and st.session_state.pending_prompt:
-    prompt = st.session_state.pending_prompt
-    st.session_state.pending_prompt = None
 
-if prompt:
-    with st.chat_message("user", avatar="🧑"):
+def handle_prompt(prompt: str):
+    with st.chat_message("user", avatar="🙋"):
         st.markdown(prompt)
-
     with st.chat_message("assistant", avatar="🍦"):
-        with st.spinner("🍨 Thinking (planning → querying data → reasoning)..."):
+        with st.spinner("Thinking (planning → querying data → reasoning)..."):
             try:
                 answer, updated_history = run_agent(prompt, st.session_state.history)
                 st.markdown(answer)
                 st.session_state.history = updated_history
             except Exception as e:
                 st.error(f"Error: {e}")
+
+
+if st.session_state.queued_prompt:
+    p = st.session_state.queued_prompt
+    st.session_state.queued_prompt = None
+    handle_prompt(p)
+
+if prompt := st.chat_input("Ask about melt risk, inventory, or demand... 🍨"):
+    handle_prompt(prompt)
