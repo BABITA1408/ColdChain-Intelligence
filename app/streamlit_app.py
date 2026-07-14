@@ -10,14 +10,16 @@ WAREHOUSE_PATH = os.path.join(PROJECT_ROOT, "warehouse.duckdb")
 
 sys.path.insert(0, APP_DIR)
 
+# set_page_config MUST be the first Streamlit command in the script.
+st.set_page_config(page_title="Melt Risk Agent", page_icon="🍦", layout="centered")
+
 
 @st.cache_resource(show_spinner=False)
 def bootstrap_pipeline():
     """
     Self-bootstrapping pipeline: if the warehouse doesn't exist yet (e.g. fresh
     deploy on Streamlit Cloud), generate data, load it, and run dbt - once per
-    app instance. This is the same DAG run_pipeline.sh runs locally; here it's
-    triggered automatically so the deployed app works with zero manual setup.
+    app instance.
     """
     if os.path.exists(WAREHOUSE_PATH):
         return "already built"
@@ -25,13 +27,10 @@ def bootstrap_pipeline():
     env["MELT_RISK_DB_PATH"] = WAREHOUSE_PATH
     env["DBT_PROFILES_DIR"] = os.path.join(PROJECT_ROOT, "dbt_project")
 
-    # Use the exact same Python interpreter running this Streamlit app (sys.executable),
-    # not a bare "python3" command - on some hosts (like Streamlit Cloud) "python3" can
-    # resolve to a different interpreter than the one with our pip-installed packages.
     python_exe = sys.executable
     dbt_exe = os.path.join(os.path.dirname(python_exe), "dbt")
     if not os.path.exists(dbt_exe):
-        dbt_exe = "dbt"  # fall back to PATH if not found alongside the interpreter
+        dbt_exe = "dbt"
 
     steps = [
         ([python_exe, "generate_data.py"], os.path.join(PROJECT_ROOT, "data")),
@@ -50,237 +49,267 @@ with st.spinner("🍦 Scooping intelligence..."):
 
 from agent import run_agent
 
-st.set_page_config(page_title="Melt Risk Agent", page_icon="🍦", layout="centered")
-
 # ============================================================================
-# THEME / CSS  -  premium ice-cream-boutique visual system
+# THEME / CSS  —  "Gelato Boutique" visual system
+# Palette: vanilla cream base, strawberry / mango / mint / blueberry accents,
+# chocolate text. Two type families: Fredoka (display) + Manrope (body/UI).
+# Signature element: the melting drip divider with real falling drops,
+# tying visually into the "melt risk" concept itself.
 # ============================================================================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 /* ---------------------------------------------------------------------- */
 /* 1. DESIGN TOKENS                                                        */
 /* ---------------------------------------------------------------------- */
 :root {
-    --cream:        #FFF9F0;
-    --vanilla:      #FFF1DC;
-    --plum:         #2B1735;
-    --plum-2:       #3C2149;
-    --raspberry:    #FF4D8D;
-    --raspberry-dk: #D6266A;
-    --mint:         #3DE0C0;
-    --mint-dk:      #1FA98D;
-    --lemon:        #FFD866;
-    --grape:        #B47CFF;
-    --sky:          #7FD7F5;
-    --choco:        #4A2E1F;
-    --text-light:   #F3E8FF;
-    --glass:        rgba(255,255,255,0.08);
-    --glass-brd:    rgba(255,255,255,0.20);
+    --cream:         #FFFBF5;
+    --vanilla:       #FFF3E1;
+    --strawberry:    #FF7AA2;
+    --strawberry-dk: #E85585;
+    --mango:         #FFB648;
+    --mango-dk:      #EF9B1F;
+    --mint:          #4FD8B8;
+    --mint-dk:       #22A98A;
+    --blueberry:     #8B7CF0;
+    --blueberry-dk:  #6C5AD6;
+    --lavender:      #E4D9FA;
+    --cotton-candy:  #FFD9E8;
+    --choco:         #4A2E1F;
+    --choco-soft:    #7A5B48;
+    --white-glass:   rgba(255,255,255,0.55);
+    --white-glass-brd: rgba(255,255,255,0.85);
+    --shadow-soft:   0 10px 30px rgba(122, 91, 72, 0.12);
+    --shadow-lift:   0 18px 40px rgba(122, 91, 72, 0.18);
 }
 
-html, body, [class*="css"] { font-family: 'Quicksand', sans-serif; }
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+
+html, body, [class*="css"] { font-family: 'Manrope', sans-serif; }
 
 /* ---------------------------------------------------------------------- */
-/* 2. BACKGROUND - layered gradient + drifting blurred blobs + sprinkles   */
+/* 2. BACKGROUND — soft cream base + drifting pastel blobs + sprinkles     */
+/*    (decorative layer sits at z-index:-1 so it can NEVER cover content,  */
+/*    regardless of how Streamlit names its containers)                    */
 /* ---------------------------------------------------------------------- */
 .stApp {
     background:
-        radial-gradient(circle at 4px 4px, rgba(255,77,141,.35) 1.5px, transparent 1.5px),
-        radial-gradient(circle at 24px 34px, rgba(61,224,192,.28) 1.5px, transparent 1.5px),
-        radial-gradient(circle at 44px 14px, rgba(255,216,102,.26) 1.5px, transparent 1.5px),
-        linear-gradient(180deg, var(--plum) 0%, var(--plum-2) 100%);
-    background-size: 60px 60px, 60px 60px, 60px 60px, auto;
-    background-attachment: fixed;
-    position: relative;
-    overflow-x: hidden;
+        radial-gradient(circle at 15% 10%, rgba(255,122,162,0.10) 0%, transparent 40%),
+        radial-gradient(circle at 85% 6%, rgba(79,216,184,0.12) 0%, transparent 38%),
+        radial-gradient(circle at 50% 95%, rgba(139,124,240,0.08) 0%, transparent 45%),
+        var(--cream);
 }
 
-.mr-blobs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.mr-decor { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
 .mr-blob {
-    position: absolute; border-radius: 50%; filter: blur(50px); opacity: 0.55;
-    animation: blobDrift 16s ease-in-out infinite;
+    position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.45;
+    animation: blobDrift 18s ease-in-out infinite;
+    will-change: transform;
 }
-.mr-blob.b1 { width: 340px; height: 340px; top: -80px; left: -60px; background: var(--raspberry); animation-delay: 0s; }
-.mr-blob.b2 { width: 300px; height: 300px; top: 10%; right: -80px; background: var(--mint); animation-delay: -5s; }
-.mr-blob.b3 { width: 260px; height: 260px; bottom: -60px; left: 20%; background: var(--grape); animation-delay: -9s; }
-.mr-blob.b4 { width: 220px; height: 220px; bottom: 10%; right: 10%; background: var(--lemon); opacity: 0.35; animation-delay: -3s; }
+.mr-blob.b1 { width: 320px; height: 320px; top: -100px; left: -80px; background: var(--strawberry); animation-delay: 0s; }
+.mr-blob.b2 { width: 280px; height: 280px; top: 8%; right: -90px; background: var(--mint); animation-delay: -6s; }
+.mr-blob.b3 { width: 260px; height: 260px; bottom: -80px; left: 15%; background: var(--blueberry); opacity: 0.3; animation-delay: -10s; }
+.mr-blob.b4 { width: 220px; height: 220px; bottom: 6%; right: 8%; background: var(--mango); opacity: 0.3; animation-delay: -3s; }
 @keyframes blobDrift {
     0%, 100% { transform: translate(0,0) scale(1); }
-    33%      { transform: translate(24px,-30px) scale(1.08); }
-    66%      { transform: translate(-18px,18px) scale(0.95); }
+    33%      { transform: translate(26px,-24px) scale(1.06); }
+    66%      { transform: translate(-20px,20px) scale(0.96); }
 }
-
-/* Floating decorative emojis - purely cosmetic, ignore clicks */
-.mr-float-emoji {
-    position: fixed; font-size: 1.8rem; opacity: 0.35; pointer-events: none; z-index: 0;
-    animation: floatY 6s ease-in-out infinite;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
+.mr-sprinkle {
+    position: fixed; font-size: 1.4rem; opacity: 0.5; pointer-events: none; z-index: -1;
+    animation: sprinkleFloat 7s ease-in-out infinite;
+    will-change: transform;
 }
-@keyframes floatY {
-    0%, 100% { transform: translateY(0) rotate(-4deg); }
-    50%      { transform: translateY(-18px) rotate(4deg); }
+@keyframes sprinkleFloat {
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    50%      { transform: translateY(-16px) rotate(6deg); }
 }
-
-/* Make sure real content sits above the decorative layer */
-[data-testid="stAppViewContainer"] > .main { position: relative; z-index: 1; }
 
 /* ---------------------------------------------------------------------- */
-/* 3. HERO HEADER                                                          */
+/* 3. HERO — colorful gradient card, guaranteed contrast (white text on   */
+/*    saturated gradient, never gradient-clipped text on a pale bg)       */
 /* ---------------------------------------------------------------------- */
-.mr-header { padding: 2.4rem 1.8rem 3.4rem 1.8rem; text-align: center; position: relative; }
+.mr-hero {
+    background: linear-gradient(135deg, var(--strawberry) 0%, var(--mango) 50%, var(--mint) 100%);
+    border-radius: 32px;
+    padding: 2.6rem 2rem 3.6rem 2rem;
+    text-align: center;
+    position: relative;
+    box-shadow: var(--shadow-lift);
+    overflow: hidden;
+}
+.mr-hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.35) 0%, transparent 45%);
+    pointer-events: none;
+}
+.mr-logo-wrap {
+    position: relative; display: inline-block; margin-bottom: 0.3rem;
+}
+.mr-logo-glow {
+    position: absolute; inset: -20px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.55) 0%, transparent 70%);
+    animation: glowPulse 3.2s ease-in-out infinite;
+    z-index: 0;
+}
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50%      { opacity: 1; transform: scale(1.12); }
+}
 .mr-logo {
-    font-size: 4rem; display: inline-block;
-    animation: logoPulse 3.2s ease-in-out infinite;
-    filter: drop-shadow(0 10px 20px rgba(255,77,141,0.45));
+    position: relative; z-index: 1;
+    font-size: 4.2rem; display: inline-block;
+    animation: logoBob 3.2s ease-in-out infinite;
+    filter: drop-shadow(0 12px 18px rgba(74,46,31,0.28));
 }
-@keyframes logoPulse {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    50%      { transform: scale(1.08) rotate(-3deg); }
+@keyframes logoBob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50%      { transform: translateY(-10px) rotate(2deg); }
 }
 .mr-title {
     font-family: 'Fredoka', sans-serif;
     font-weight: 700;
-    font-size: 3.4rem;
-    line-height: 1.05;
-    margin: 0.3rem 0 0 0;
-    background: linear-gradient(90deg, var(--raspberry) 0%, var(--lemon) 33%, var(--mint) 66%, var(--grape) 100%);
-    background-size: 280% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: shimmer 8s ease-in-out infinite;
-}
-@keyframes shimmer {
-    0%   { background-position: 0% center; }
-    50%  { background-position: 100% center; }
-    100% { background-position: 0% center; }
+    font-size: 3rem;
+    line-height: 1.1;
+    margin: 0.4rem 0 0 0;
+    color: #FFFFFF;
+    text-shadow: 0 4px 14px rgba(74,46,31,0.25);
+    letter-spacing: -0.01em;
 }
 .mr-subtitle {
     font-weight: 600;
-    color: #E4D6F7;
-    max-width: 620px;
+    color: rgba(255,255,255,0.96);
+    max-width: 600px;
     margin: 0.9rem auto 0 auto;
-    font-size: 1.05rem;
-    line-height: 1.6;
+    font-size: 1.03rem;
+    line-height: 1.65;
+    text-shadow: 0 2px 8px rgba(74,46,31,0.15);
 }
-/* Melting drip divider under the header */
-.mr-drip {
-    height: 38px;
-    margin-top: -1px;
-    background-image: radial-gradient(circle at 22px -12px, transparent 20px, var(--cream) 21px);
-    background-size: 44px 44px;
-    background-repeat: repeat-x;
-    background-position: bottom;
-    animation: dripWiggle 5s ease-in-out infinite;
-}
-@keyframes dripWiggle { 0%,100% { background-position-x: 0; } 50% { background-position-x: 6px; } }
-
-.mr-badges { display: flex; gap: 0.55rem; justify-content: center; flex-wrap: wrap; margin-top: 1.3rem; }
+.mr-badges { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1.6rem; }
 .mr-badge {
-    background: var(--glass);
-    border: 1px solid var(--glass-brd);
-    backdrop-filter: blur(8px);
-    color: var(--text-light);
-    padding: 0.36rem 0.95rem;
+    background: var(--white-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--white-glass-brd);
+    color: var(--choco);
+    padding: 0.4rem 1rem;
     border-radius: 999px;
     font-size: 0.8rem;
     font-weight: 700;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.mr-badge:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(0,0,0,0.25); }
+.mr-badge:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
 
-/* ---------------------------------------------------------------------- */
-/* 4. GLASS CARD + GRADIENT BORDER (reusable pattern)                      */
-/* ---------------------------------------------------------------------- */
-.gradient-border-fx { position: relative; }
-.gradient-border-fx::before {
-    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px;
-    background: linear-gradient(135deg, var(--raspberry), var(--lemon), var(--mint), var(--grape));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    pointer-events: none; opacity: 0.85;
+/* Signature element: melting drip divider with real falling drops */
+.mr-drip-wrap { position: relative; height: 46px; margin: -2px 0 2.2rem 0; }
+.mr-drip {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 24px -14px, transparent 22px, var(--cream) 23px);
+    background-size: 48px 48px;
+    background-repeat: repeat-x;
+    background-position: top;
+}
+.mr-drop {
+    position: absolute; top: 14px; width: 10px; height: 10px; border-radius: 50% 50% 50% 0;
+    transform: rotate(45deg);
+    animation: dripFall 3.4s ease-in infinite;
+    will-change: transform, opacity;
+}
+.mr-drop.d1 { left: 18%; background: var(--strawberry); animation-delay: 0s; }
+.mr-drop.d2 { left: 42%; background: var(--mango); animation-delay: 1.1s; }
+.mr-drop.d3 { left: 66%; background: var(--mint-dk); animation-delay: 2.0s; }
+.mr-drop.d4 { left: 84%; background: var(--blueberry); animation-delay: 0.6s; }
+@keyframes dripFall {
+    0%   { transform: translateY(0) rotate(45deg); opacity: 0; }
+    15%  { opacity: 1; }
+    80%  { opacity: 0.9; }
+    100% { transform: translateY(26px) rotate(45deg); opacity: 0; }
 }
 
 /* ---------------------------------------------------------------------- */
-/* 5. SIDEBAR                                                              */
+/* 4. SIDEBAR — pastel dashboard                                          */
 /* ---------------------------------------------------------------------- */
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #1D0F26 0%, #2B1735 100%);
-    border-right: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(180deg, var(--lavender) 0%, var(--cream) 65%);
+    border-right: 1px solid rgba(74,46,31,0.06);
 }
-[data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+[data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, [data-testid="stSidebar"] .stMarkdown h3 {
     font-family: 'Fredoka', sans-serif;
-    color: var(--mint) !important;
+    color: var(--choco) !important;
+    font-weight: 600;
 }
 [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] span {
-    color: #E4D6F7;
+    color: var(--choco-soft);
 }
 [data-testid="stSidebar"] .stButton button {
     width: 100%; text-align: left;
-    background: var(--glass);
-    border: 1px solid var(--glass-brd);
-    color: var(--text-light);
-    border-radius: 14px;
-    padding: 0.65rem 1rem;
-    margin-bottom: 0.5rem;
+    background: rgba(255,255,255,0.75);
+    border: 1.5px solid rgba(255,255,255,0.9);
+    color: var(--choco);
+    border-radius: 16px;
+    padding: 0.7rem 1rem;
+    margin-bottom: 0.55rem;
     font-weight: 700;
     font-size: 0.85rem;
-    transition: all 0.22s cubic-bezier(.2,.8,.2,1);
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.2s cubic-bezier(.2,.8,.2,1), box-shadow 0.2s ease, border-color 0.2s ease;
 }
-[data-testid="stSidebar"] .stButton button:nth-of-type(5n+1):hover { border-color: var(--raspberry); box-shadow: 0 6px 18px rgba(255,77,141,0.4); }
-[data-testid="stSidebar"] .stButton button:nth-of-type(5n+2):hover { border-color: var(--mint); box-shadow: 0 6px 18px rgba(61,224,192,0.4); }
-[data-testid="stSidebar"] .stButton button:nth-of-type(5n+3):hover { border-color: var(--lemon); box-shadow: 0 6px 18px rgba(255,216,102,0.4); }
-[data-testid="stSidebar"] .stButton button:nth-of-type(5n+4):hover { border-color: var(--grape); box-shadow: 0 6px 18px rgba(180,124,255,0.4); }
-[data-testid="stSidebar"] .stButton button:hover { transform: translateY(-2px) scale(1.015); }
-[data-testid="stSidebar"] .stButton button:active { transform: scale(0.97); }
+[data-testid="stSidebar"] .stButton button:hover {
+    transform: translateY(-3px) scale(1.015);
+    border-color: var(--strawberry);
+    box-shadow: var(--shadow-lift);
+}
+[data-testid="stSidebar"] .stButton button:active { transform: translateY(-1px) scale(0.98); }
 
 /* ---------------------------------------------------------------------- */
-/* 6. CHAT MESSAGES                                                        */
+/* 5. CHAT MESSAGES — floating pastel bubbles, animated entrance          */
 /* ---------------------------------------------------------------------- */
 [data-testid="stChatMessage"] {
-    background: rgba(255, 249, 240, 0.98) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 10px 26px rgba(0,0,0,0.25);
-    padding: 0.55rem 0.35rem;
-    margin-bottom: 0.85rem;
-    border-left: 5px solid var(--mint);
+    background: #FFFFFF !important;
+    border-radius: 22px !important;
+    box-shadow: var(--shadow-soft);
+    padding: 0.6rem 0.4rem;
+    margin-bottom: 0.9rem;
+    border: 1.5px solid var(--vanilla);
     animation: messageIn 0.45s cubic-bezier(.2,.8,.2,1) both;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform, opacity;
 }
-[data-testid="stChatMessage"]:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0,0,0,0.3); }
+[data-testid="stChatMessage"]:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
 @keyframes messageIn {
-    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    from { opacity: 0; transform: translateY(14px) scale(0.97); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
-/* Messages alternate user/assistant in DOM order - color-code by position */
-[data-testid="stChatMessage"]:nth-of-type(odd)  { border-left-color: var(--raspberry); }
-[data-testid="stChatMessage"]:nth-of-type(even) { border-left-color: var(--mint-dk); }
+[data-testid="stChatMessage"]:nth-of-type(odd)  { border-left: 5px solid var(--strawberry); }
+[data-testid="stChatMessage"]:nth-of-type(even) { border-left: 5px solid var(--mint-dk); background: #FBFFFD !important; }
 [data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li {
     color: var(--choco) !important; font-weight: 600;
 }
-[data-testid="stChatMessage"] strong { color: var(--raspberry-dk) !important; }
+[data-testid="stChatMessage"] strong { color: var(--strawberry-dk) !important; }
 
-/* Chat input */
+/* Chat input — pill, glow on focus */
 [data-testid="stChatInput"] {
-    background: rgba(255, 249, 240, 0.97);
+    background: #FFFFFF;
     border-radius: 999px;
-    border: 2px solid var(--grape);
+    border: 2px solid var(--lavender);
+    box-shadow: var(--shadow-soft);
     transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 [data-testid="stChatInput"]:focus-within {
-    border-color: var(--raspberry);
-    box-shadow: 0 0 0 5px rgba(255,77,141,0.22), 0 10px 26px rgba(180,124,255,0.35);
+    border-color: var(--strawberry);
+    box-shadow: 0 0 0 5px rgba(255,122,162,0.18), var(--shadow-lift);
 }
 [data-testid="stChatInput"] textarea { color: var(--choco) !important; font-weight: 600; }
 
 /* ---------------------------------------------------------------------- */
-/* 7. BUTTONS (global)                                                     */
+/* 6. BUTTONS (global)                                                     */
 /* ---------------------------------------------------------------------- */
 .stButton button {
-    border-radius: 12px;
+    border-radius: 14px;
     font-weight: 700;
     transition: all 0.22s cubic-bezier(.2,.8,.2,1);
 }
@@ -288,50 +317,54 @@ html, body, [class*="css"] { font-family: 'Quicksand', sans-serif; }
 .stButton button:active { transform: translateY(0) scale(0.97); }
 
 /* ---------------------------------------------------------------------- */
-/* 8. API KEY FORM CARD                                                    */
+/* 7. API KEY FORM CARD — glass card                                       */
 /* ---------------------------------------------------------------------- */
 [data-testid="stForm"] {
-    background: var(--glass);
-    border: 1px solid var(--glass-brd);
-    border-radius: 22px;
-    padding: 1.6rem;
+    background: rgba(255,255,255,0.75);
+    border: 1.5px solid rgba(255,255,255,0.9);
+    border-radius: 24px;
+    padding: 1.7rem;
     backdrop-filter: blur(10px);
-    position: relative;
+    box-shadow: var(--shadow-soft);
 }
 
 /* ---------------------------------------------------------------------- */
-/* 9. CUSTOM SCROLLBAR                                                     */
+/* 8. CUSTOM SCROLLBAR                                                     */
 /* ---------------------------------------------------------------------- */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--raspberry), var(--mint));
+    background: linear-gradient(180deg, var(--strawberry), var(--mint));
     border-radius: 10px;
 }
-::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--raspberry-dk), var(--mint-dk)); }
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--strawberry-dk), var(--mint-dk)); }
 
-/* Hide default Streamlit chrome */
 #MainMenu, footer { visibility: hidden; }
 </style>
 
-<div class="mr-blobs">
+<div class="mr-decor">
     <div class="mr-blob b1"></div>
     <div class="mr-blob b2"></div>
     <div class="mr-blob b3"></div>
     <div class="mr-blob b4"></div>
+    <div class="mr-sprinkle" style="top:10%; left:6%; animation-delay:0s;">🍓</div>
+    <div class="mr-sprinkle" style="top:16%; right:8%; animation-delay:-2s;">🍫</div>
+    <div class="mr-sprinkle" style="bottom:20%; left:9%; animation-delay:-4s;">✨</div>
+    <div class="mr-sprinkle" style="bottom:12%; right:10%; animation-delay:-1s;">🧊</div>
+    <div class="mr-sprinkle" style="top:45%; left:3%; animation-delay:-3s;">🍭</div>
+    <div class="mr-sprinkle" style="top:55%; right:4%; animation-delay:-5s;">⭐</div>
 </div>
-<div class="mr-float-emoji" style="top:8%; left:6%; animation-delay:0s;">🍓</div>
-<div class="mr-float-emoji" style="top:14%; right:8%; animation-delay:-2s;">🍫</div>
-<div class="mr-float-emoji" style="bottom:18%; left:10%; animation-delay:-4s;">✨</div>
-<div class="mr-float-emoji" style="bottom:10%; right:12%; animation-delay:-1s;">🧊</div>
 """, unsafe_allow_html=True)
 
 # ============================================================================
-# HEADER
+# HERO
 # ============================================================================
 st.markdown("""
-<div class="mr-header">
-    <div class="mr-logo">🍦</div>
+<div class="mr-hero">
+    <div class="mr-logo-wrap">
+        <div class="mr-logo-glow"></div>
+        <div class="mr-logo">🍦</div>
+    </div>
     <h1 class="mr-title">Melt Risk Agent</h1>
     <p class="mr-subtitle">
         An agentic AI analyst for ice cream cold-chain distribution. Ask about melt risk,
@@ -345,7 +378,13 @@ st.markdown("""
         <span class="mr-badge">⚡ Agentic tool-calling</span>
     </div>
 </div>
-<div class="mr-drip"></div>
+<div class="mr-drip-wrap">
+    <div class="mr-drip"></div>
+    <div class="mr-drop d1"></div>
+    <div class="mr-drop d2"></div>
+    <div class="mr-drop d3"></div>
+    <div class="mr-drop d4"></div>
+</div>
 """, unsafe_allow_html=True)
 
 # --- API key handling: Streamlit secrets (deployed) or manual entry (local) ---
@@ -357,7 +396,7 @@ if not api_key:
     api_key = st.session_state.get("groq_api_key")
 
 if not api_key:
-    st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
     with st.form("api_key_form"):
         st.markdown("##### 🔑 Enter your free Groq API key to start")
         st.caption("Get one at console.groq.com/keys — it's free, takes 30 seconds, and is never stored anywhere.")
@@ -383,8 +422,6 @@ SUGGESTIONS = [
     "📋 Summarize overall risk across the network",
 ]
 
-# Playful, rotating loading messages for the "thinking" spinner - cosmetic only,
-# does not touch the agent logic itself.
 THINKING_MESSAGES = [
     "🍦 Scooping intelligence...",
     "🍨 Checking frozen inventory...",
@@ -397,7 +434,7 @@ with st.sidebar:
     st.markdown("### 🍨 Try asking")
     for s in SUGGESTIONS:
         if st.button(s, key=f"sugg_{s}", use_container_width=True):
-            st.session_state.queued_prompt = s.split(" ", 1)[1]  # strip emoji
+            st.session_state.queued_prompt = s.split(" ", 1)[1]
             st.rerun()
 
     st.divider()
