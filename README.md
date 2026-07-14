@@ -1,4 +1,4 @@
-# 🍦 Melt Risk Agent
+# 🍦 ColdChain Intelligence
 
 An end-to-end **Data Engineering + GenAI + Agentic AI** project: an AI analyst that monitors
 an ice cream cold-chain distribution network and answers questions like *"which shipments
