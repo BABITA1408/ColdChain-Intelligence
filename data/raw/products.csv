@@ -1,0 +1,23 @@
+product_id,product_name,format,shelf_life_days_frozen,melt_tolerance_hours,unit_cost
+IC001,Belgian Chocolate Tub 500ml,Tub 500ml,180,3.5,1.94
+IC002,Belgian Chocolate Mini Cup 100ml,Mini Cup 100ml,90,5.5,1.37
+IC003,Belgian Chocolate Family Pack 1L,Family Pack 1L,120,5.0,1.34
+IC004,Strawberry Ripple Mini Cup 100ml,Mini Cup 100ml,270,3.3,4.32
+IC005,Vanilla Bean Family Pack 1L,Family Pack 1L,270,4.0,2.02
+IC006,Pistachio Tub 500ml,Tub 500ml,90,4.3,3.1
+IC007,Pistachio Mini Cup 100ml,Mini Cup 100ml,180,6.8,5.07
+IC008,Butterscotch Tub 500ml,Tub 500ml,270,2.5,2.75
+IC009,Black Currant Cone,Cone,120,6.2,1.44
+IC010,Strawberry Ripple Cone,Cone,90,7.1,5.79
+IC011,Cookies & Cream Cone,Cone,270,5.8,3.13
+IC012,Pistachio Cone,Cone,120,6.0,4.92
+IC013,Belgian Chocolate Mini Cup 100ml,Mini Cup 100ml,120,5.2,2.5
+IC014,Mint Choc Chip Stick Bar,Stick Bar,180,7.9,4.59
+IC015,Butterscotch Family Pack 1L,Family Pack 1L,180,7.1,5.31
+IC016,Strawberry Ripple Tub 500ml,Tub 500ml,180,4.4,1.55
+IC017,Black Currant Cone,Cone,120,5.9,3.3
+IC018,Mint Choc Chip Family Pack 1L,Family Pack 1L,180,2.8,5.15
+IC019,Butterscotch Cone,Cone,270,7.4,3.32
+IC020,Strawberry Ripple Family Pack 1L,Family Pack 1L,270,2.5,1.45
+IC021,Belgian Chocolate Family Pack 1L,Family Pack 1L,120,6.8,3.44
+IC022,Belgian Chocolate Stick Bar,Stick Bar,270,5.6,3.68

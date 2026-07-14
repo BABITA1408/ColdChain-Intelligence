@@ -1,0 +1,8 @@
+.streamlit/secrets.toml
+*.duckdb
+dbt_project/target/
+dbt_project/logs/
+dbt_project/dbt_packages/
+__pycache__/
+*.pyc
+.DS_Store

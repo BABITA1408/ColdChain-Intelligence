@@ -1,0 +1,8 @@
+duckdb
+dbt-core>=1.8
+dbt-duckdb>=1.8
+pandas
+numpy
+faker
+groq
+streamlit

@@ -1,0 +1,7 @@
+supply_chain:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('MELT_RISK_DB_PATH') }}"
+      threads: 4

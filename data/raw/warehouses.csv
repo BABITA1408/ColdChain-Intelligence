@@ -1,0 +1,6 @@
+warehouse_id,warehouse_name,region
+CW01,Mumbai Cold Hub,West
+CW02,Delhi Cold Hub,North
+CW03,Bengaluru Cold Hub,South
+CW04,Kolkata Cold Hub,East
+CW05,Bhubaneswar Cold Hub,East
