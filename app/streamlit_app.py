@@ -54,52 +54,54 @@ st.set_page_config(page_title="Melt Risk Agent", page_icon="🍦", layout="cente
 # ============================== THEME / CSS ==============================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap');
 
 :root {
-    --cream: #FFF6EC;
-    --deep-navy: #0E2138;
-    --deep-navy-2: #16314F;
-    --raspberry: #FF5D8F;
-    --raspberry-dark: #E14577;
-    --mint: #5EEAD4;
-    --peach: #FFB37B;
+    --cream: #FFF9F0;
+    --plum: #2D1B3D;
+    --plum-2: #3F2350;
+    --raspberry: #FF4D8D;
+    --raspberry-dark: #D6266A;
+    --mint: #3DE0C0;
+    --mint-dark: #1FA98D;
+    --lemon: #FFD866;
+    --grape: #B47CFF;
     --choco: #4A2E1F;
-    --text-light: #F6F3EE;
+    --text-light: #F3E8FF;
 }
 
 html, body, [class*="css"] {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Quicksand', sans-serif;
 }
 
-/* Main app background: deep frosty navy with soft blurred dessert-colored blobs */
+/* Main app background: rich plum/berry gradient + scattered sprinkle confetti texture */
 .stApp {
     background:
-        radial-gradient(circle at 12% 8%, rgba(255, 93, 143, 0.30) 0%, transparent 40%),
-        radial-gradient(circle at 88% 15%, rgba(94, 234, 212, 0.22) 0%, transparent 38%),
-        radial-gradient(circle at 50% 95%, rgba(255, 179, 123, 0.18) 0%, transparent 45%),
-        linear-gradient(180deg, var(--deep-navy) 0%, var(--deep-navy-2) 100%);
+        radial-gradient(circle at 4px 4px, rgba(255,77,141,0.35) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 24px 34px, rgba(61,224,192,0.30) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 44px 14px, rgba(255,216,102,0.28) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 14% 10%, rgba(255,77,141,0.28) 0%, transparent 42%),
+        radial-gradient(circle at 90% 12%, rgba(61,224,192,0.24) 0%, transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(180,124,255,0.22) 0%, transparent 48%),
+        linear-gradient(180deg, var(--plum) 0%, var(--plum-2) 100%);
+    background-size: 60px 60px, 60px 60px, 60px 60px, auto, auto, auto, auto;
     background-attachment: fixed;
 }
 
 /* ---------- Header banner ---------- */
-.mr-header {
-    padding: 2.2rem 1.8rem 3.2rem 1.8rem;
-    text-align: center;
-    position: relative;
-}
+.mr-header { padding: 2.2rem 1.8rem 3.2rem 1.8rem; text-align: center; position: relative; }
 .mr-title {
-    font-family: 'Baloo 2', sans-serif;
-    font-weight: 800;
-    font-size: 3rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    font-size: 3.1rem;
     line-height: 1.05;
     margin: 0;
-    background: linear-gradient(90deg, var(--raspberry) 0%, var(--peach) 45%, var(--mint) 100%);
-    background-size: 200% auto;
+    background: linear-gradient(90deg, var(--raspberry) 0%, var(--lemon) 35%, var(--mint) 70%, var(--grape) 100%);
+    background-size: 250% auto;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    animation: mr-shimmer 7s ease-in-out infinite;
+    animation: mr-shimmer 8s ease-in-out infinite;
 }
 @keyframes mr-shimmer {
     0%   { background-position: 0% center; }
@@ -107,17 +109,17 @@ html, body, [class*="css"] {
     100% { background-position: 0% center; }
 }
 .mr-subtitle {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     font-weight: 600;
-    color: #C9D6E5;
+    color: #E4D6F7;
     max-width: 640px;
-    margin: 0.7rem auto 0 auto;
-    font-size: 1.02rem;
-    line-height: 1.5;
+    margin: 0.8rem auto 0 auto;
+    font-size: 1.04rem;
+    line-height: 1.55;
 }
 /* Melting drip divider under the header */
 .mr-drip {
-    height: 34px;
+    height: 36px;
     margin-top: -1px;
     background-image: radial-gradient(circle at 22px -12px, transparent 20px, var(--cream) 21px);
     background-size: 44px 44px;
@@ -126,87 +128,95 @@ html, body, [class*="css"] {
 }
 
 /* ---------- Badges row ---------- */
-.mr-badges { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+.mr-badges { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1.1rem; }
 .mr-badge {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.22);
     color: var(--text-light);
-    padding: 0.28rem 0.85rem;
+    padding: 0.32rem 0.9rem;
     border-radius: 999px;
-    font-size: 0.78rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.02em;
 }
 
 /* ---------- Sidebar ---------- */
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0B1A2C 0%, #10233B 100%);
-    border-right: 1px solid rgba(255,255,255,0.06);
+    background: linear-gradient(180deg, #201029 0%, #2D1B3D 100%);
+    border-right: 1px solid rgba(255,255,255,0.08);
 }
 [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
-    font-family: 'Baloo 2', sans-serif;
+    font-family: 'Fredoka', sans-serif;
     color: var(--mint) !important;
 }
 [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] span {
-    color: #D8E2EC;
+    color: #E4D6F7;
 }
 [data-testid="stSidebar"] .stButton button {
     width: 100%;
     text-align: left;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
     color: var(--text-light);
     border-radius: 12px;
-    padding: 0.55rem 0.9rem;
-    margin-bottom: 0.4rem;
-    font-weight: 600;
+    padding: 0.6rem 0.95rem;
+    margin-bottom: 0.45rem;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
     font-size: 0.85rem;
     transition: all 0.15s ease;
 }
-[data-testid="stSidebar"] .stButton button:hover {
-    background: linear-gradient(90deg, rgba(255,93,143,0.25), rgba(94,234,212,0.25));
-    border-color: var(--mint);
-    transform: translateX(2px);
-}
+[data-testid="stSidebar"] .stButton button:nth-of-type(5n+1):hover { border-color: var(--raspberry); box-shadow: 0 0 16px rgba(255,77,141,0.35); }
+[data-testid="stSidebar"] .stButton button:nth-of-type(5n+2):hover { border-color: var(--mint); box-shadow: 0 0 16px rgba(61,224,192,0.35); }
+[data-testid="stSidebar"] .stButton button:nth-of-type(5n+3):hover { border-color: var(--lemon); box-shadow: 0 0 16px rgba(255,216,102,0.35); }
+[data-testid="stSidebar"] .stButton button:nth-of-type(5n+4):hover { border-color: var(--grape); box-shadow: 0 0 16px rgba(180,124,255,0.35); }
+[data-testid="stSidebar"] .stButton button:hover { transform: translateX(3px); }
 
 /* ---------- Chat area ---------- */
-.stChatMessage, [data-testid="stChatMessage"] {
-    background: rgba(255, 246, 236, 0.97) !important;
+[data-testid="stChatMessage"] {
+    background: rgba(255, 249, 240, 0.98) !important;
     border-radius: 18px !important;
-    border: 1px solid rgba(255,255,255,0.5);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-    padding: 0.4rem 0.2rem;
-    margin-bottom: 0.7rem;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.22);
+    padding: 0.5rem 0.3rem;
+    margin-bottom: 0.8rem;
+    border-left: 5px solid var(--mint);
 }
+/* Chat messages alternate user/assistant in DOM order - color-code by position */
+[data-testid="stChatMessage"]:nth-of-type(odd) { border-left-color: var(--raspberry); }
+[data-testid="stChatMessage"]:nth-of-type(even) { border-left-color: var(--mint-dark); }
 [data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li {
     color: var(--choco) !important;
     font-weight: 600;
+    font-family: 'Quicksand', sans-serif;
 }
 [data-testid="stChatMessage"] strong { color: var(--raspberry-dark) !important; }
 
 /* Chat input box */
 [data-testid="stChatInput"] {
-    background: rgba(255, 246, 236, 0.95);
+    background: rgba(255, 249, 240, 0.97);
     border-radius: 16px;
-    border: 2px solid var(--mint);
+    border: 2px solid var(--grape);
 }
 [data-testid="stChatInput"] textarea {
     color: var(--choco) !important;
     font-weight: 600;
+    font-family: 'Quicksand', sans-serif;
 }
 
 /* Generic buttons in main area */
 .stButton button {
     border-radius: 10px;
+    font-family: 'Quicksand', sans-serif;
     font-weight: 700;
 }
 
 /* Form / API key card */
 [data-testid="stForm"] {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 16px;
-    padding: 1.4rem;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 18px;
+    padding: 1.5rem;
 }
 
 /* Hide default Streamlit chrome we don't need */
@@ -217,7 +227,7 @@ html, body, [class*="css"] {
 # ============================== HEADER ==============================
 st.markdown("""
 <div class="mr-header">
-    <div style="font-size: 3.2rem;">🍦</div>
+    <div style="font-size: 3.4rem;">🍦</div>
     <h1 class="mr-title">Melt Risk Agent</h1>
     <p class="mr-subtitle">
         An agentic AI analyst for ice cream cold-chain distribution. Ask about melt risk,
